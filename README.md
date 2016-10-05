@@ -1,2 +1,2 @@
 # PythonScript
-python script will include all the exercise or example I used.
+python script will include all the exercises or examples I used.
