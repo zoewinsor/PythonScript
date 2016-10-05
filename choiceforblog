@@ -1,0 +1,106 @@
+#-*- coding: UTF-8 -*-   
+
+"""
+算法：
+（1）今天的天气（权重2）：晴（６分）、雪（５分）、阴（1分）、雨（１分）、其他（２分）；
+（2）前一篇博客的评论数（权重3）：１条评论0.5分，最多30分；
+（3）空闲时间（权重4）： >2小时（6分）、0.5~2小时（4分）、<0.5小时（0分）；
+（4）家里猫咪的表现（权重1）： 很乖（4分）、调皮（2分）、疯了（0分）。
+最终得分=天气得分*天气权重+评论得分*评论权重+空闲得分*空闲权重+猫咪得分*猫咪权重;
+备注：若分值小于等于30则休息。否则根据分值计算抽取话题，生成随机数与最终得分相加得分除10取余，0~9分别对应博客的10个标签分类，若为余数在0~9，则选取对应标签的话题进行写作；
+"""
+
+import time
+import sys
+import random
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+def Event(date,weather,comment,freetime,meow):
+    """
+    根据权重和输入计算当天活动.算法分数范围在[2,50]之间,大于30分时当天要码字，抽取编写话题，记录日志
+    输入参数：天气得分、评论得分、空闲得分、猫咪得分
+    输出：评分结果
+    """
+    weatherScore=Weather(weather)
+    commentScore=CommentNumber(comment)
+    freetimeScore=FreeTime(freetime)
+    meowScore=Meow(meow)
+    score=weatherScore*2+int(commentScore)*3+freetimeScore*4+meowScore*1
+    if score>26:
+        value=GetTopic(score)
+        log="%s-->Input:weather：%s，comment：%d条，freetime：%d hour，猫%s\n-->Output：The score is %d\n-->What a good day.You should write blog. Just do it!\n-->The topic is %s\n"%(date,weather,comment,freetime,meow,score,value)
+        print log
+    else:
+        log="%s-->Input:weather：%s，comment：%d条，freetime：%d hour，猫%s\n-->Output:The score is %d\n...Well,well,well.Have a good rest...\n"%(date,weather,comment,freetime,meow,score)
+        print log
+    file_object =open('F:\log.txt', 'a+')
+    file_object.writelines(log)
+    file_object.close()
+
+def Weather(weather):
+    """
+    根据输入天气进行评分换算
+    输入参数：weather,天气情况
+    返回参数：天气评分
+    """
+    weatherdic= {'晴': 6,'雪': 5, '阴': 1,'雨': 1,'其他': 2}
+    if weather in weatherdic:
+        weatherScore=weatherdic[weather]
+    else:
+        weatherScore=2
+    return weatherScore
+
+
+def CommentNumber(number):
+    """
+    根据前一篇博客的评论数进行评分换算
+    输入参数：number，前一篇博客的评论数
+    返回参数：博客评论数评分
+    """
+    commentScore=number*0.5
+    return commentScore
+
+def FreeTime(freetime):
+    """
+    根据当天空闲时间进行评分换算
+    输入参数：freetime，当天的空闲时间
+    返回参数：时间评分
+    """
+    if freetime>=2:
+        freetimeScore=6
+    elif freetime>0.5:
+        freetimeScore=4
+    else: 
+        freetimeScore=0
+    return freetimeScore
+
+
+def Meow(meow):
+    """
+    根据猫的调皮程度进行评分换算
+    输入参数：猫的调皮程度
+    返回参数：猫的影响评分
+    """
+    meowdic= {'很乖': 4, '调皮': 2, '疯了': 0,'其他': 2}
+    if meow in meowdic:
+        meowScore=meowdic[meow]
+    else:
+        meowScore=2
+    return meowScore
+
+def GetTopic(score):
+    """
+    score取余，余数0~9对应标签1~10。
+    """
+    topicList= ['设计','自动化','奇趣','编程','研习','产品','算法','大数据','修行','默认']
+    randomNo=random.randint(1,50)
+    print 'randomNo：%d\n'%randomNo
+    remainder=(score+randomNo)%10
+    return topicList[remainder]
+
+if __name__=='__main__':
+    date= time.strftime('%Y-%m-%d')
+    print 'Today is '+str(date)
+    #Event函数参数：date,weather,comment,freetime,meow
+    Event(date,'晴',1,0.5,'疯了')
