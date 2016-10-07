@@ -101,7 +101,7 @@ def GetTopic(score):
 
 if __name__=='__main__':
     date= time.strftime('%Y-%m-%d')
-    print 'Hello,Cleline,Today is '+str(date)
+    print 'Hello,Celine,Today is '+str(date)
     file_object =open('F:\log.txt', 'a+')
     file_object.writelines(date)
     file_object.close()
